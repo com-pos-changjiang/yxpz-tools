@@ -133,11 +133,58 @@ def is_placeholder_value(value: str) -> bool:
     return len(v) < 8 or any(h in v for h in PLACEHOLDER_HINTS)
 
 
+def _parse_simple_toml(text: str) -> dict:
+    """Python 3.10 无 tomllib 时的降级解析器。
+
+    只支持本工具用到的 TOML 子集: [section]、[[array-of-tables]]、
+    字符串/布尔/整数、字符串数组(允许跨行)。"""
+    root: dict = {}
+    current: dict = root
+    lines = text.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i].strip()
+        i += 1
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("[["):
+            current = {}
+            root.setdefault(line.strip("[]").strip(), []).append(current)
+            continue
+        if line.startswith("["):
+            current = root.setdefault(line.strip("[]").strip(), {})
+            continue
+        if "=" not in line:
+            continue
+        k, _, v = line.partition("=")
+        k = k.strip().strip("\"'")
+        v = v.strip()
+        if v.startswith("["):  # 字符串数组, 允许跨行; 注释行因不含引号被自然忽略
+            buf = v
+            while "]" not in buf and i < len(lines):
+                buf += " " + lines[i].strip()
+                i += 1
+            current[k] = [a or b for a, b in re.findall(r"'([^']*)'|\"([^\"]*)\"", buf)]
+        elif v.startswith(("'", '"')):
+            current[k] = v.strip("'\"")
+        elif v in ("true", "false"):
+            current[k] = v == "true"
+        else:
+            try:
+                current[k] = int(v)
+            except ValueError:
+                current[k] = v
+    return root
+
+
 def load_rules(path: Path) -> tuple[list[dict], list[str], list[str]]:
     """读取自定义规则 TOML。返回 (patterns, allow_paths, allow_regexes)。"""
-    import tomllib
-
-    data = tomllib.loads(path.read_text(encoding="utf-8"))
+    raw = path.read_text(encoding="utf-8")
+    try:
+        import tomllib
+        data = tomllib.loads(raw)
+    except ModuleNotFoundError:
+        data = _parse_simple_toml(raw)
     patterns = []
     for p in data.get("patterns", []):
         try:
@@ -224,8 +271,9 @@ def scan_working_tree(findings: list, repo: Path, patterns: list[dict], allow_pa
     stats["binaries"] = binaries
 
 
-def scan_authors(findings: list, repo: Path, patterns: list[dict], stats: dict) -> None:
-    """提交者邮箱随每次 push 公开——本项目的作者邮箱就属于这类泄露。"""
+def scan_authors(findings: list, repo: Path, patterns: list[dict], allow_regexes: list,
+                 stats: dict) -> None:
+    """提交者邮箱随每次 push 公开——个人邮箱默认按中危处理，allowlist 可豁免有意公开的联系方式。"""
     try:
         out = git(repo, "log", "--all", "--format=%an%x09%ae")
     except RuntimeError:
@@ -239,6 +287,8 @@ def scan_authors(findings: list, repo: Path, patterns: list[dict], stats: dict) 
         for p in email_pats:
             m = p["regex"].search(email) or p["regex"].search(name)
             if m:
+                if any(r.search(m.group(0)) for r in allow_regexes):
+                    continue
                 add_finding(findings, p["severity"], "git-author", f"git 提交者信息({p['name']})",
                             "git log(所有提交)", None, f"{name} <{email}>")
 
@@ -404,11 +454,19 @@ def main() -> int:
 
     patterns = list(BUILTIN_PATTERNS)
     allow_paths, allow_regexes = [], []
-    rules_path = Path(args.rules) if args.rules else repo / ".claude" / "sensitive-rules.local.toml"
-    if rules_path.is_file():
-        custom, allow_paths, allow_regexes = load_rules(rules_path)
-        patterns.extend(custom)
-        print(f"[信息] 已加载自定义规则: {rules_path}")
+    # 默认加载两层规则: 项目级(可提交,放"有意公开"的豁免) + 本地级(勿提交,放公司敏感词)
+    rule_files = (
+        [Path(args.rules)] if args.rules else
+        [repo / ".claude" / "sensitive-rules.toml",
+         repo / ".claude" / "sensitive-rules.local.toml"]
+    )
+    for rules_path in rule_files:
+        if rules_path.is_file():
+            custom, ap, ar = load_rules(rules_path)
+            patterns.extend(custom)
+            allow_paths.extend(ap)
+            allow_regexes.extend(ar)
+            print(f"[信息] 已加载规则文件: {rules_path}")
 
     try:
         findings: list[dict] = []
@@ -416,7 +474,7 @@ def main() -> int:
         seen: set[tuple] = set()  # 同一内容在多个提交的补丁里重复出现时只报一次
         scan_working_tree(findings, repo, patterns, allow_paths, allow_regexes, stats)
         if repo_files(repo):  # 是 git 仓库才做 git 维度的扫描
-            scan_authors(findings, repo, patterns, stats)
+            scan_authors(findings, repo, patterns, allow_regexes, stats)
             if not args.skip_history:
                 scan_history_content(findings, repo, patterns, stats)
                 scan_deleted_files(findings, repo)

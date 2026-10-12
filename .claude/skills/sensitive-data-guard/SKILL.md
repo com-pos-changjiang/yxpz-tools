@@ -79,10 +79,13 @@ python .claude/skills/sensitive-data-guard/scripts/scan.py --repo <仓库路径>
 
 ## 自定义规则（公司专属关键词）
 
-内置规则覆盖通用模式。公司内部信息（内网域名、项目代号、工号段）需要自定义规则：
+内置规则覆盖通用模式。自定义规则分两层，扫描器默认两层都加载：
 
+- **项目级**（可提交）：`.claude/sensitive-rules.toml`——放"有意公开"的豁免项，
+  例如作者主动公开的联系方式邮箱（登记在 `[allowlist]`，扫描时不再按泄露处理）
 - 模板（可提交）：`.claude/sensitive-rules.example.toml`
-- 实际规则（**绝不提交**）：`.claude/sensitive-rules.local.toml`（已在 .gitignore）
+- **本地级**（**绝不提交**）：`.claude/sensitive-rules.local.toml`（已在 .gitignore）——
+  放公司内部域名、项目代号等敏感词
 
 为什么实际规则必须 gitignore：如果规则文件里写着公司域名/内部系统地址，把这个文件
 传上 GitHub 等于主动公布"这个仓库的作者属于哪家公司"——规则本身就是泄露。
