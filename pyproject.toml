@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yxpz-tools"
+version = "0.1.2"
+description = "简单的DrssionPage运行配置工具集"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "yxpz" },
+]
+keywords = ["tools", "utils", "helper"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/com-pos-changjiang/yxpz-tools"
+
+[project.scripts]
+yxpz = "yxpz_tools.cli:main"
+
+#打包范围由下面的参数限定,src下面的文件
+[tool.setuptools.packages.find]
+where = ["src"]
