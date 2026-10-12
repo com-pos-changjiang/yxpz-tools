@@ -7,9 +7,9 @@
 `yxpz-tools`：一个简单的 Python 实用工具集，已发布到 PyPI。
 采用 src 布局，构建后端为 setuptools（PEP 621，配置全在 `pyproject.toml`）。
 
-- 源码：`src/yxpz_tools/`（仅 3 个文件：`__init__.py`、`core.py`、`cli.py`）
+- 源码：`src/yxpz_tools/`（`__init__.py`、`core.py`、`cli.py`、`webUtils.py` + `utils/` 子包）
 - 命令行入口：`yxpz`（映射到 `yxpz_tools.cli:main`）
-- 运行时依赖：**无**（全部为标准库）
+- 运行时依赖：DrissionPage、colorama、python-docx、openpyxl、xlrd（见 `pyproject.toml`）
 - 开发/发布依赖：`requirements-dev.txt`（build、twine）
 
 ## 发布流程（已自动化）

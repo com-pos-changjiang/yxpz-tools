@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "yxpz-tools"
 version = "0.1.2"
-description = "简单的DrssionPage运行配置工具集"
+description = "简单的DrissionPage运行配置工具集"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -13,6 +13,13 @@ authors = [
     { name = "yxpz" },
 ]
 keywords = ["tools", "utils", "helper"]
+dependencies = [
+    "DrissionPage>=4.1.0",
+    "colorama>=0.4.6",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "xlrd>=2.0.0",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
