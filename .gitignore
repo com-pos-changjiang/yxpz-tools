@@ -7,3 +7,7 @@ __pycache__/
 .idea/
 logs/
 .pytest_cache/
+
+# 敏感数据扫描的自定义规则（含公司关键词，绝不能上传）
+.claude/sensitive-rules.local.toml
+.claude/settings.local.json

@@ -30,7 +30,21 @@ python release.py <新版本号> -y         # 跳过上传前的确认
 4. `twine check` 校验元数据
 5. 确认后 `twine upload` 上传
 
-### 发布注意事项
+### 发布/推送前的硬门禁（必须遵守）
+
+**任何发布动作之前必须先跑敏感数据扫描**（`git push`、`twine upload`、`release.py`
+不带 `--dry-run`、首次公开到 GitHub 等）：
+
+```bash
+python .claude/skills/sensitive-data-guard/scripts/scan.py
+```
+
+- 退出码 2（高危）：**禁止发布**，除非用户明确说「我已知晓风险，强制继续」
+- 退出码 1（中危）：逐条向用户确认后才能继续
+- 公司专属敏感词规则写在 `.claude/sensitive-rules.local.toml`（已 gitignore，绝不提交）
+- 详细流程见 `.claude/skills/sensitive-data-guard/SKILL.md`
+
+## 发布注意事项
 
 - **版本号必须递增**：PyPI 不允许重复上传相同版本号，传错了只能升号重发
 - 版本号格式：`x.y.z`（脚本会校验）

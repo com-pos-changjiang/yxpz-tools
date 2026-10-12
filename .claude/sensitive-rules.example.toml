@@ -1,0 +1,46 @@
+# 敏感数据自定义规则模板
+#
+# 使用方法：
+#   cp .claude/sensitive-rules.example.toml .claude/sensitive-rules.local.toml
+#   然后在 local 文件里填入公司真实关键词
+#
+# ⚠️ .claude/sensitive-rules.local.toml 已被 .gitignore 排除，绝不能提交——
+#    公司域名/内部系统地址写进公开仓库本身就是泄露。
+
+[[patterns]]
+id = "company-domain"
+name = "公司域名"
+# 示例用 example.com 占位；local 文件里换成真实域名
+regex = 'corp\.example\.com'
+severity = "high"
+
+[[patterns]]
+id = "internal-system"
+name = "内部系统地址"
+regex = 'wiki\.internal\.example\.com'
+severity = "high"
+
+[[patterns]]
+id = "employee-id"
+name = "员工工号"
+# 按公司工号格式调整，例如 6 位纯数字
+regex = '(?<!\d)EMP\d{6}(?!\d)'
+severity = "medium"
+
+[[patterns]]
+id = "project-codename"
+name = "内部项目代号"
+regex = '(?i)project[-_]?phoenix'
+severity = "medium"
+
+[allowlist]
+# 路径命中则整个文件跳过（正则，匹配相对路径）
+paths = [
+    # skill 自带检测规则样例，避免扫描器自匹配
+    '^\.claude/skills/sensitive-data-guard/',
+    '^\.claude/sensitive-rules\.example\.toml$',
+]
+# 命中文本若匹配这些正则则忽略该条发现（排除测试样例/文档示例）
+regexes = [
+    'EXAMPLE|SAMPLE|placeholder|你的公司域名',
+]
