@@ -2,5 +2,5 @@
 
 from .core import greet, random_string, slugify
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __all__ = ["greet", "slugify", "random_string", "__version__"]
