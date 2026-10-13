@@ -14,7 +14,7 @@ authors = [
 ]
 keywords = ["tools", "utils", "helper"]
 dependencies = [
-    "DrissionPage>=4.1.0",
+    "DrissionPage>=4.1.1.4",
     "colorama>=0.4.6",
     "python-docx>=1.1.0",
     "openpyxl>=3.1.0",
