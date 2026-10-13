@@ -36,7 +36,7 @@ class Logger(metaclass=SingletonMeta):
 
     def _create_logger(self):
         """创建并配置日志器，包括控制台和文件输出."""
-        self.logger = logging.getLogger('March7thAssistant')
+        self.logger = logging.getLogger('yxpz_tools')
         self.logger.propagate = False
         self.logger.setLevel(self._level)
 
@@ -55,7 +55,7 @@ class Logger(metaclass=SingletonMeta):
 
     def _create_logger_title(self):
         """创建专用于标题日志的日志器."""
-        self.logger_title = logging.getLogger('March7thAssistant_title')
+        self.logger_title = logging.getLogger('yxpz_tools_title')
         self.logger_title.propagate = False
         self.logger_title.setLevel(self._level)
 
@@ -137,8 +137,9 @@ class Logger(metaclass=SingletonMeta):
             elif level == 2:
                 formatted_title = '-' * half_separator_left + ' ' + title + ' ' + '-' * half_separator_right
             self._print_title(formatted_title, write)
-        except:
-            pass
+        except Exception as e:
+            # 不用裸 except: pass——静默吞错会让格式化问题无从排查
+            self.logger.debug(f'标题格式化失败: {e!r}，原始标题: {title!r}')
 
     def _custom_len(self, text):
         """
