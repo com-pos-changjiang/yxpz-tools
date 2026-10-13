@@ -1,0 +1,4 @@
+# 开发/发布环境依赖（非包运行时依赖）
+# 用法: pip install -r requirements-dev.txt
+build
+twine
