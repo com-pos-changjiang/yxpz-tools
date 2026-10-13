@@ -46,12 +46,18 @@ def read_all_type_excel(file_path):
         os.rename(file_path, new_file_path)
         before_name = file_path
         file_path = new_file_path
+        is_rename = True
 
-    data_line = read_all_excel(file_path)
-    if is_rename: #如果修改名称后还是无法读取，需要回滚到之前的状态
-        # print('文件修改后缀依旧无法读取，进行回滚操作')
-        os.rename(file_path, before_name)
-    elif data_line is None:
+    try:
+        data_line = read_all_excel(file_path)
+    except Exception:
+        # 改后缀后依旧无法读取，回滚文件名再抛出原异常
+        if is_rename:
+            os.rename(file_path, before_name)
+        raise
+    if data_line is None:
+        if is_rename:
+            os.rename(file_path, before_name)
         raise Exception(f'文件读取失败: {file_path}')
     return data_line
 def read_all_type_excel_by_column(file_path):
@@ -98,12 +104,12 @@ def excelReadByColumn(filename):
     # for col in sheet.iter_cols(min_col=2, max_col=3, values_only=True):  # 只读取第2列和第3列
     #     print(list(col))
 
-def excelReadLine(file_name,row_num):
+def excelReadLine(file_name, row_num):
+    """读取活动工作表中指定行的全部单元格值，返回一维列表。row_num 从 1 开始。"""
     wb = load_workbook(file_name)
     wa = wb.active
-    row = row_num
-    line_content = []
-    print(len(wa.max_column))
+    line_content = [cell.value for cell in wa[row_num]]
+    wb.close()
     return line_content
 
 def readXls(file_name):

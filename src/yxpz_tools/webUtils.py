@@ -59,7 +59,6 @@ class webSite:
             # 解决linux服务器运行，chrome数据文件权限问题，将文件目录设置为用户所在目录
             user_data_path = Path.home() / '.chrome_date'
             print(f'设置chrome目录：{user_data_path}')
-            import os
             os.makedirs(user_data_path, exist_ok=True)
             co.set_user_data_path(user_data_path)
 

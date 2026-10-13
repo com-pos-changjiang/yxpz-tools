@@ -99,8 +99,8 @@ def write_data_to_new_sheet(fileName, dataLines, new_sheet_name='结果'):
     workbook.save(fileName)
 
 
-def set_style_number():
-    file_name = r'xx.xlsx'
+def set_style_number(file_name):
+    # file_name = r'xx.xlsx'
     wb = load_workbook(file_name)
     ws = wb.active
     for cell in ws['L']:

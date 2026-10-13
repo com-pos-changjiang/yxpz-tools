@@ -3,9 +3,8 @@ from ftplib import FTP
 
 class ftpUtils:
     def __init__(self):
-        self.ftp = FTP()
         self.HOST = ''
-        self.PORT = 22
+        self.PORT = 21
         self.USER = ''
         self.PASS = ''
 
