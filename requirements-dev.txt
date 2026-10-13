@@ -1,4 +1,18 @@
-# 开发/发布环境依赖（非包运行时依赖）
+# 依赖汇总：运行时依赖 + 开发/发布工具
 # 用法: pip install -r requirements-dev.txt
+#
+# 运行时依赖与 pyproject.toml [project].dependencies 保持一致
+
+# 运行时依赖
+DrissionPage>=4.1.1.4
+colorama>=0.4.6
+python-docx>=1.1.0
+openpyxl>=3.1.0
+xlrd>=2.0.0
+
+# 计划中的依赖（后续功能使用，代码尚未引用）
+oracledb
+
+# 开发/发布工具
 build
 twine

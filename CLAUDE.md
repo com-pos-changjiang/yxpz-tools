@@ -10,7 +10,7 @@
 - 源码：`src/yxpz_tools/`（`__init__.py`、`core.py`、`cli.py`、`webUtils.py` + `utils/` 子包）
 - 命令行入口：`yxpz`（映射到 `yxpz_tools.cli:main`）
 - 运行时依赖：DrissionPage、colorama、python-docx、openpyxl、xlrd（见 `pyproject.toml`）
-- 开发/发布依赖：`requirements-dev.txt`（build、twine）
+- 依赖汇总：`requirements-dev.txt`（运行时 5 依赖 + oracledb 预留 + build/twine）
 
 ## 发布流程（已自动化）
 
