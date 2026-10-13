@@ -224,8 +224,8 @@ def scan_text_content(findings: list, patterns: list[dict], allow_paths, allow_r
         if high_only and p["severity"] != HIGH:
             continue
         for m in p["regex"].finditer(text):
-            if p["id"] == "cred-assign" and is_placeholder_value(m.group(0)):
-                continue
+            if p["id"] in ("cred-assign", "conn-password") and is_placeholder_value(m.group(0)):
+                continue  # 凭证类规则先过占位符滤网: <用户名>:<密码> 这类教程示例不算泄露
             if any(r.search(m.group(0)) for r in allow_regexes):
                 continue
             line_no = text.count("\n", 0, m.start()) + 1
